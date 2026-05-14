@@ -7,21 +7,25 @@ This repository contains a comprehensive **UVM (Universal Verification Methodolo
 
 * **Constrained Random Verification (CRV):** 
   Defined custom `uvm_sequence_item` classes with `rand` variables. Implemented constraint blocks to ensure 32-bit address alignment and valid data generation, injecting hundreds of randomized transactions into the DUT to thoroughly test its state machine.
+  
 * **Protocol Checking with SystemVerilog Assertions (SVA):** 
   Embedded SVA blocks directly inside the AXI4-Lite interface. This acts as a real-time hardware monitor to instantly catch protocol violations, such as ensuring `VALID`/`READY` handshake hold rules, payload stability during wait states, and strictly checking for unknown (`X` or `Z`) states during reset.
+  
 * **Advanced Scoreboard & Reference Model:** 
   Developed a zero-delay software reference model using an associative array. The Scoreboard automatically predicts expected data upon write operations and performs on-the-fly comparisons against actual read data from the DUT.
+  
 * **Register Abstraction Layer (RAL):** 
   Modeled the DUT's memory map using `uvm_reg_block` and `uvm_reg`. Implemented a custom RAL Adapter to translate register transactions into AXI bus transactions, and established **Backdoor Access** for zero-delay hardware state inspection without consuming simulation time.
+  
 * **Virtual Sequencer & Complex Scenario Injection:** 
   Designed virtual sequences to test complex corner cases. This includes Read-Modify-Write operations and an **Error Injection Sequence** that intentionally targets out-of-bound memory addresses to verify the DUT's `bresp/rresp` error handling logic.
+
 * **Automated Regression & CI/CD Pipeline:** 
   Developed a comprehensive `Makefile` to automate compilation, execute multi-seed regression runs, parse log files for Pass/Fail extraction, and merge coverage databases (`.ucdb`) into a unified HTML report.
 
 ## Architecture & Directory Structure
 
-![UVM Architecture](docs/uvm_architecture.png)
-*(Note: Replace with your actual block diagram image)*
+<img width="599" height="327" alt="Image" src="https://github.com/user-attachments/assets/cffd6f8c-efda-4523-a649-96ad53f1344b" />
 
 ```text
 ├── rtl/       # Design Under Test (AXI4-Lite Slave)
