@@ -19,15 +19,15 @@ A scalable UVM (Universal Verification Methodology) testbench designed to valida
 ##  Key Verification Scenarios & Sequences
 To thoroughly verify the DUT, various UVM sequences were implemented ranging from basic random traffic to highly targeted corner-case scenarios.
 
-- sy_sequence (Directed-Random Read-After-Write): Generates random addresses and payloads to verify data persistence and memory integrity. Through unconstrained random address generation, this sequence dynamically proved two critical hardware behaviors in a single run:
+- *sy_sequence* (Directed-Random Read-After-Write): Generates random addresses and payloads to verify data persistence and memory integrity. Through unconstrained random address generation, this sequence dynamically proved two critical hardware behaviors in a single run:
   <img width="1798" height="750" alt="Image" src="https://github.com/user-attachments/assets/1c5a714c-bcb7-420f-b5ed-22dc75182cd5" />
   * **1. Out-of-Bounds Error Handling (Resp=10):** When invalid addresses (e.g., `0xFC`, `0xAC`) were randomly generated, the DUT correctly asserted a Slave Error (`Resp=10`). The Scoreboard intelligently identified and bypassed these invalid transactions (`Ignored Error Transaction`), preventing false simulation failures.
   * **2. Perfect Data Match (Resp=00):** When the sequence hit a valid register address (e.g., `0x00000008` in Loop 3), the DUT returned an OKAY response (`Resp=00`). The subsequent Read command to the exact same address resulted in a flawless `MATCH!` in the Scoreboard, proving absolute data integrity.
 
-- vseq_rmw (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
+- *vseq_rmw* (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
   <img width="2458" height="598" alt="Image" src="https://github.com/user-attachments/assets/57f98b2c-b634-4271-a7d8-0643ee54e884" />
 
-- sy_ral_sequence (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
+- *sy_ral_sequence* (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
   <img width="2460" height="669" alt="Image" src="https://github.com/user-attachments/assets/c3e2eb92-69c1-4663-85c1-576a0b7605b4" />
   * **1. Frontdoor Write (Address Translation):** By simply calling `ctrl_reg.write()` without any physical address information, the RAL Adapter dynamically looked up the register map, translated it to `Addr=0x00`, and successfully passed the AXI transaction to the Driver. 
     *(Log: `[RAL_SEQ] Wrote 1 to CTRL_REG via RAL` ➔ `[DRV] Starting AXI Write Transaction`)*
@@ -50,7 +50,7 @@ The testbench utilizes an advanced Scoreboard with an associative array-based Re
 ### 1. Data Match & Integrity Verification
 During the full sweep scenario, the Scoreboard dynamically stored expected values upon Write operations and flawlessly matched them against actual Read data.
 ```text
-SCB] Stored Expected: Addr=00000008, Data=33333333
+[SCB] Stored Expected: Addr=00000008, Data=33333333
 [MON] Captured WRITE: Addr=00000008, Data=33333333, Resp=00
 [DRV] Starting AXI Read Transaction...
 [SCB] MATCH! Addr=00000008, Data=33333333
@@ -72,7 +72,7 @@ By simulating both valid address spaces (0x00 to 0x0C) and invalid/error-inducin
 
 ## Getting Started (How to Run)
 This project includes a `Makefile` configured for Questa/ModelSim environments. 
-Navigate to the `scripts/` directory and use the following commands:
+Navigate to the `sim/` directory and use the following commands:
 
 **1. Run a single default simulation:**
 ```bash
