@@ -26,7 +26,7 @@ To thoroughly verify the DUT, various UVM sequences were implemented ranging fro
   <img width="2458" height="828" alt="Image" src="https://github.com/user-attachments/assets/cd2f5f45-2297-47a4-9ab9-c4b97b97b887" />
 
 - sy_ral_sequence (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
-<img width="2460" height="858" alt="Image" src="https://github.com/user-attachments/assets/827bf187-c54a-4b0b-a503-63b518b595ef" />
+  <img width="2460" height="858" alt="Image" src="https://github.com/user-attachments/assets/827bf187-c54a-4b0b-a503-63b518b595ef" />
 
 
 ## SVA (SystemVerilog Assertions) Protocol Checking
