@@ -1,57 +1,65 @@
-# AXI4-Lite UVM Verification 
+# AXI4-Lite UVM Verification
 
 ## Project Overview
-This repository contains a comprehensive **UVM (Universal Verification Methodology)** testbench developed to verify an AXI4-Lite Slave IP. Built over an intensive 11-week development cycle, this project demonstrates a full-stack verification pipeline. It covers everything from basic UVM infrastructure and protocol-level assertions to advanced features like a Register Abstraction Layer (RAL), Constrained Random Verification (CRV), and automated CI/CD regression scripts.
+This repository contains a comprehensive **UVM (Universal Verification Methodology)** testbench developed to verify an AXI4-Lite Slave IP. Built over an intensive 11-week development cycle, this project demonstrates a full-stack verification pipeline. It covers everything from basic UVM infrastructure and protocol-level assertions to advanced features like a Register Abstraction Layer (RAL), Constrained Random Verification (CRV), complex virtual sequences, and automated CI/CD regression scripts.
 
-## Key Verification Features & Methodologies
-
-* **Constrained Random Verification (CRV):** 
-  Defined custom `uvm_sequence_item` classes with `rand` variables. Implemented constraint blocks to ensure 32-bit address alignment and valid data generation, injecting hundreds of randomized transactions into the DUT to thoroughly test its state machine.
-  
-* **Protocol Checking with SystemVerilog Assertions (SVA):** 
-  Embedded SVA blocks directly inside the AXI4-Lite interface. This acts as a real-time hardware monitor to instantly catch protocol violations, such as ensuring `VALID`/`READY` handshake hold rules, payload stability during wait states, and strictly checking for unknown (`X` or `Z`) states during reset.
-  
-* **Advanced Scoreboard & Reference Model:** 
-  Developed a zero-delay software reference model using an associative array. The Scoreboard automatically predicts expected data upon write operations and performs on-the-fly comparisons against actual read data from the DUT.
-  
-* **Register Abstraction Layer (RAL):** 
-  Modeled the DUT's memory map using `uvm_reg_block` and `uvm_reg`. Implemented a custom RAL Adapter to translate register transactions into AXI bus transactions, and established **Backdoor Access** for zero-delay hardware state inspection without consuming simulation time.
-  
-* **Virtual Sequencer & Complex Scenario Injection:** 
-  Designed virtual sequences to test complex corner cases. This includes Read-Modify-Write operations and an **Error Injection Sequence** that intentionally targets out-of-bound memory addresses to verify the DUT's `bresp/rresp` error handling logic.
-
-* **Automated Regression & CI/CD Pipeline:** 
-  Developed a comprehensive `Makefile` to automate compilation, execute multi-seed regression runs, parse log files for Pass/Fail extraction, and merge coverage databases (`.ucdb`) into a unified HTML report.
-
-## Architecture & Directory Structure
-
+## Architecture Block Diagram
 <img width="599" height="327" alt="Image" src="https://github.com/user-attachments/assets/cffd6f8c-efda-4523-a649-96ad53f1344b" />
 
+## Directory Structure
 ```text
 ├── rtl/       # Design Under Test (AXI4-Lite Slave)
 ├── src/       # UVM Components (Agent, Monitor, Scoreboard, RAL, etc.)
 ├── tb/        # Testbench Top and AXI Interface (with SVA)
 ├── sim/       # Simulation working directory (Makefile, logs, coverage databases)
-├── scripts/   # Automation scripts (Python log parsers, etc.)
-└── docs/      # Architecture images, waveforms, and coverage reports
+├── scripts/   # Automation scripts and parsers
+└── docs/      # Waveforms, diagrams, and coverage reports
 ```
 
-##  Simulation Waveform Analysis
-To verify the physical layer timing, waveform analysis was conducted to trace the lifecycle of a transaction.
+##  Key Verification Scenarios & Sequences
+To thoroughly verify the DUT, various UVM sequences were implemented ranging from basic random traffic to highly targeted corner-case scenarios.
 
-The image below demonstrates the sequence item generation and its translation by the Driver. It shows the UVM Sequence successfully generating a randomized payload, passing it to the Driver via the Sequencer's TLM port, and the Driver accurately toggling the AXI4-Lite physical pins (e.g., AWADDR, AWVALID, WDATA) in accordance with the strict handshake protocol.
-(Note: Replace with your waveform screenshot showing the UVM sequence passing data to the driver and the resulting AXI pin toggles)
+- sy_sequence (Directed-Random Read-After-Write): Generates a random valid address, writes a randomized payload, and immediately issues a read command to the exact same address to verify data persistence and memory integrity.
+
+- vseq_rmw (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
+
+- sy_ral_sequence (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
+
+<img width="2964" height="528" alt="Image" src="https://github.com/user-attachments/assets/b2fe87a0-7b67-442d-996e-e0dc227244cc" />
 
 
-## Verification Results: 100% Functional Coverage
-To ensure the robustness of the verification environment, a UVM Subscriber was implemented to collect functional coverage.
+## SVA (SystemVerilog Assertions) Protocol Checking
+To prove the robustness of the hardware monitors embedded in the axi4_lite_if, intentional timing and protocol violations were injected into the UVM Driver. The SVA successfully caught extreme corner-case bugs instantly, generating SVA FATAL errors without needing to inspect waveforms manually.
 
-### Overcoming Coverage Holes
-Initially, a coverage hole was detected because the random traffic accessed 4 physical registers, while the early RAL model only defined 2. The RAL model was immediately updated to perfectly match the DUT's physical memory map (ctrl_reg, status_reg, reg_2, reg_3).
+Intentional Bugs Caught:
+1. Reset Rule Violation: WVALID was forced high during the active-low reset phase.
+2. Payload Stability Violation: WDATA was mutated while waiting for WREADY to assert.
+<img width="1582" height="534" alt="Image" src="https://github.com/user-attachments/assets/8ca80031-5b8e-4aeb-8bf6-9fe6d3997290" />
 
-Furthermore, a specific Out-of-Bound bin was added to the coverage model to strictly track the execution of the Error Injection scenarios. As a result, 100% Cross-Coverage (combining Read/Write operations across all valid and invalid address spaces) was successfully achieved and merged across all random regression seeds.
+## Simulation Results & Log Analysis
+The testbench utilizes an advanced Scoreboard with an associative array-based Reference Model to verify data integrity and handle error codes autonomously.
 
-<img width="728" height="40" alt="Image" src="https://github.com/user-attachments/assets/d8673ed3-b5fe-4a08-8441-719732a340be" />
+### 1. Data Match & Integrity Verification
+During the full sweep scenario, the Scoreboard dynamically stored expected values upon Write operations and flawlessly matched them against actual Read data.
+```text
+SCB] Stored Expected: Addr=00000008, Data=33333333
+[MON] Captured WRITE: Addr=00000008, Data=33333333, Resp=00
+[DRV] Starting AXI Read Transaction...
+[SCB] MATCH! Addr=00000008, Data=33333333
+```
+### 2. Error Injection (Corner Case Handling)
+An out-of-bound address (0xFFFF0000) was intentionally injected. The DUT correctly returned a Slave Error (Resp=10), and the Scoreboard intelligently ignored the invalid data to prevent false failures.
+
+```text
+[VSEQ_ERR] Sent Invalid Write Access to Address 0xFFFF0000
+[MON] Captured WRITE: Addr=ffff0000, Data=deaddead, Resp=10
+[SCB] Ignored Error Transaction: Addr=ffff0000, Resp=10
+```
+<img width="961" height="225" alt="Image" src="https://github.com/user-attachments/assets/a81ca2fd-b36c-4928-9cb7-9ec1c412c962" />
+
+### 3. 100% Functional Coverage
+By simulating both valid address spaces (0x00 to 0x0C) and invalid/error-inducing address spaces, a perfect 100% Cross-Coverage (combining Read/Write commands with specific address bins) was achieved and validated via the UVM Subscriber.
+<img width="2488" height="232" alt="Image" src="https://github.com/user-attachments/assets/d54ea37d-d07b-4112-a594-972b564c1a04" />
 
 
 ## Getting Started (How to Run)
