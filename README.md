@@ -20,12 +20,13 @@ This repository contains a comprehensive **UVM (Universal Verification Methodolo
 To thoroughly verify the DUT, various UVM sequences were implemented ranging from basic random traffic to highly targeted corner-case scenarios.
 
 - sy_sequence (Directed-Random Read-After-Write): Generates a random valid address, writes a randomized payload, and immediately issues a read command to the exact same address to verify data persistence and memory integrity.
+  <img width="895" height="596" alt="Image" src="https://github.com/user-attachments/assets/c884a818-226a-4d06-b032-7e5f0d72fa61" />
 
 - vseq_rmw (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
+  <img width="2458" height="828" alt="Image" src="https://github.com/user-attachments/assets/cd2f5f45-2297-47a4-9ab9-c4b97b97b887" />
 
 - sy_ral_sequence (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
-
-<img width="2964" height="528" alt="Image" src="https://github.com/user-attachments/assets/b2fe87a0-7b67-442d-996e-e0dc227244cc" />
+  <img width="2964" height="528" alt="Image" src="https://github.com/user-attachments/assets/b2fe87a0-7b67-442d-996e-e0dc227244cc" />
 
 
 ## SVA (SystemVerilog Assertions) Protocol Checking
@@ -34,6 +35,7 @@ To prove the robustness of the hardware monitors embedded in the axi4_lite_if, i
 Intentional Bugs Caught:
 1. Reset Rule Violation: WVALID was forced high during the active-low reset phase.
 2. Payload Stability Violation: WDATA was mutated while waiting for WREADY to assert.
+
 <img width="1582" height="534" alt="Image" src="https://github.com/user-attachments/assets/8ca80031-5b8e-4aeb-8bf6-9fe6d3997290" />
 
 ## Simulation Results & Log Analysis
