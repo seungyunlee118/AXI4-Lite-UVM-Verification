@@ -25,20 +25,24 @@ To thoroughly verify the DUT, various UVM sequences were implemented ranging fro
   * **2. Perfect Data Match (Resp=00):** When the sequence hit a valid register address (e.g., `0x00000008` in Loop 3), the DUT returned an OKAY response (`Resp=00`). The subsequent Read command to the exact same address resulted in a flawless `MATCH!` in the Scoreboard, proving absolute data integrity.
 
 - vseq_rmw (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
-  <img width="2458" height="828" alt="Image" src="https://github.com/user-attachments/assets/cd2f5f45-2297-47a4-9ab9-c4b97b97b887" />
+  <img width="2458" height="598" alt="Image" src="https://github.com/user-attachments/assets/57f98b2c-b634-4271-a7d8-0643ee54e884" />
 
 - sy_ral_sequence (Register Abstraction Layer): Utilizes uvm_reg_block and a custom Adapter to perform Frontdoor Write/Read operations. This demonstrates automatic physical address translation (e.g., ctrl_reg to 0x00) without hardcoding addresses in the sequence.
-  <img width="2460" height="858" alt="Image" src="https://github.com/user-attachments/assets/827bf187-c54a-4b0b-a503-63b518b595ef" />
-
+  <img width="2460" height="669" alt="Image" src="https://github.com/user-attachments/assets/c3e2eb92-69c1-4663-85c1-576a0b7605b4" />
+  * **1. Frontdoor Write (Address Translation):** By simply calling `ctrl_reg.write()` without any physical address information, the RAL Adapter dynamically looked up the register map, translated it to `Addr=0x00`, and successfully passed the AXI transaction to the Driver. 
+    *(Log: `[RAL_SEQ] Wrote 1 to CTRL_REG via RAL` ➔ `[DRV] Starting AXI Write Transaction`)*
+  * **2. Frontdoor Read (Data Retrieval):** Similarly, issuing `status_reg.read()` automatically triggered an AXI Read burst to `0x04`. The Monitor captured the hardware response, and the RAL model seamlessly returned the exact read data back to the sequence. 
+    *(Log: `[DRV] Read Done: Addr=00000004` ➔ `[RAL_SEQ] Read Data 00000000 from STATUS_REG via RAL`)*
+  * **3. Autonomous Scoreboard Exception Handling:** When a Read command was issued to `STATUS_REG` (`0x04`) before any prior Write operation, the Scoreboard correctly identified the uninitialized state. Instead of triggering a false mismatch error, it intelligently logged a warning (`[SCB] Read from uninitialized address: 00000004`) and safely bypassed the comparison, proving the robust defensive logic of the reference model.
 
 ## SVA (SystemVerilog Assertions) Protocol Checking
 To prove the robustness of the hardware monitors embedded in the axi4_lite_if, intentional timing and protocol violations were injected into the UVM Driver. The SVA successfully caught extreme corner-case bugs instantly, generating SVA FATAL errors without needing to inspect waveforms manually.
 
+<img width="1582" height="534" alt="Image" src="https://github.com/user-attachments/assets/bb242088-dc09-4d1b-bb58-ddde74ccbca9" />
 Intentional Bugs Caught:
 1. Reset Rule Violation: WVALID was forced high during the active-low reset phase.
 2. Payload Stability Violation: WDATA was mutated while waiting for WREADY to assert.
 
-<img width="1582" height="534" alt="Image" src="https://github.com/user-attachments/assets/8ca80031-5b8e-4aeb-8bf6-9fe6d3997290" />
 
 ## Simulation Results & Log Analysis
 The testbench utilizes an advanced Scoreboard with an associative array-based Reference Model to verify data integrity and handle error codes autonomously.
