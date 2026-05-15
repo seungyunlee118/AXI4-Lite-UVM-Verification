@@ -1,0 +1,8 @@
+2 7 uvm_pkg 4 fast 52 /home/edward/altera_lite/25.1std/questa_fse/uvm-1.1d 0 0 26345472 0 136476 0
+2 14 questa_uvm_pkg 4 fast 52 /home/edward/altera_lite/25.1std/questa_fse/uvm-1.1d 0 0 1481728 26345472 7091 0
+1 10 sy_uvm_pkg 4 fast 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 1429504 26345472 2385 0
+1 14 tb_top_sv_unit 4 fast 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 0 26869760 0 0
+2 12 axi4_lite_if 5 synth 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 0 0 0 0
+2 12 axi4_lite_if 7 fast__2 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 0 0 26 0
+2 15 axi4_lite_slave 4 fast 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 0 0 237 0
+1 6 tb_top 4 fast 60 /mnt/c/Users/Edward/AppData/Local/quartus/AXI4_Lite/sim/work 0 0 0 26869760 116 0
