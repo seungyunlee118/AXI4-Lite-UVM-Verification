@@ -20,7 +20,7 @@ A scalable UVM (Universal Verification Methodology) testbench designed to valida
 To thoroughly verify the DUT, various UVM sequences were implemented ranging from basic random traffic to highly targeted corner-case scenarios.
 
 - sy_sequence (Directed-Random Read-After-Write): Generates random addresses and payloads to verify data persistence and memory integrity. Through unconstrained random address generation, this sequence dynamically proved two critical hardware behaviors in a single run:
-  <img width="1798" height="750" alt="Image" src="https://github.com/user-attachments/assets/0ac2599e-b856-45f1-8867-27f22c8692c5" />
+  <img width="1798" height="750" alt="Image" src="https://github.com/user-attachments/assets/1c5a714c-bcb7-420f-b5ed-22dc75182cd5" />
   * **1. Out-of-Bounds Error Handling (Resp=10):** When invalid addresses (e.g., `0xFC`, `0xAC`) were randomly generated, the DUT correctly asserted a Slave Error (`Resp=10`). The Scoreboard intelligently identified and bypassed these invalid transactions (`Ignored Error Transaction`), preventing false simulation failures.
   * **2. Perfect Data Match (Resp=00):** When the sequence hit a valid register address (e.g., `0x00000008` in Loop 3), the DUT returned an OKAY response (`Resp=00`). The subsequent Read command to the exact same address resulted in a flawless `MATCH!` in the Scoreboard, proving absolute data integrity.
 
