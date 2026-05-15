@@ -1,7 +1,7 @@
 # AXI4-Lite UVM Verification
 
 ## Project Overview
-This repository contains a comprehensive **UVM (Universal Verification Methodology)** testbench developed to verify an AXI4-Lite Slave IP. Built over an intensive 11-week development cycle, this project demonstrates a full-stack verification pipeline. It covers everything from basic UVM infrastructure and protocol-level assertions to advanced features like a Register Abstraction Layer (RAL), Constrained Random Verification (CRV), complex virtual sequences, and automated CI/CD regression scripts.
+A scalable UVM (Universal Verification Methodology) testbench designed to validate an AXI4-Lite Slave IP. This project implements a robust verification architecture capable of high-coverage functional verification. Core features include a fully integrated Register Abstraction Layer (RAL) for abstracted register accesses, complex Virtual Sequences for scenarios like Read-Modify-Write and Error Injection, and cycle-accurate protocol monitoring using SystemVerilog Assertions (SVA). The environment is optimized with automated regression and coverage collection scripts for CI/CD integration.
 
 ## Architecture Block Diagram
 <img width="599" height="327" alt="Image" src="https://github.com/user-attachments/assets/cffd6f8c-efda-4523-a649-96ad53f1344b" />
