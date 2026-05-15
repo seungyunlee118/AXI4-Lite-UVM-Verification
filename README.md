@@ -19,8 +19,10 @@ A scalable UVM (Universal Verification Methodology) testbench designed to valida
 ##  Key Verification Scenarios & Sequences
 To thoroughly verify the DUT, various UVM sequences were implemented ranging from basic random traffic to highly targeted corner-case scenarios.
 
-- sy_sequence (Directed-Random Read-After-Write): Generates a random valid address, writes a randomized payload, and immediately issues a read command to the exact same address to verify data persistence and memory integrity.
-  <img width="895" height="596" alt="Image" src="https://github.com/user-attachments/assets/c884a818-226a-4d06-b032-7e5f0d72fa61" />
+- sy_sequence (Directed-Random Read-After-Write): Generates random addresses and payloads to verify data persistence and memory integrity. Through unconstrained random address generation, this sequence dynamically proved two critical hardware behaviors in a single run:
+  <img width="1798" height="750" alt="Image" src="https://github.com/user-attachments/assets/71a3319e-344c-404b-b3fc-3d2e4678cb07" />
+  * **1. Out-of-Bounds Error Handling (Resp=10):** When invalid addresses (e.g., `0xFC`, `0xAC`) were randomly generated, the DUT correctly asserted a Slave Error (`Resp=10`). The Scoreboard intelligently identified and bypassed these invalid transactions (`Ignored Error Transaction`), preventing false simulation failures.
+  * **2. Perfect Data Match (Resp=00):** When the sequence hit a valid register address (e.g., `0x00000008` in Loop 3), the DUT returned an OKAY response (`Resp=00`). The subsequent Read command to the exact same address resulted in a flawless `MATCH!` in the Scoreboard, proving absolute data integrity.
 
 - vseq_rmw (Read-Modify-Write): A Virtual Sequence that orchestrates a complex transaction flow: reading an initial value from the DUT, modifying it dynamically in the sequence, and writing it back, proving the ability to handle dependent transactions.
   <img width="2458" height="828" alt="Image" src="https://github.com/user-attachments/assets/cd2f5f45-2297-47a4-9ab9-c4b97b97b887" />
